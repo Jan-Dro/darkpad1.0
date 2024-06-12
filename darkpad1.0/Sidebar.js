@@ -16,12 +16,12 @@ const Sidebar = ({ onPaint, onErase }) => {
 const styles = StyleSheet.create({
   sidebar: {
     position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
+    left: 240,
+    top: 60,
     justifyContent: 'center',
     padding: 10,
     zIndex: 1,
+    backgroundColor: 'rgba(51, 51, 51, 0.5)',
   },
 });
 

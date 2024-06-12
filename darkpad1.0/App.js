@@ -5,14 +5,19 @@ import Title from './Title';
 import { View, StyleSheet, Button } from 'react-native';
 import {Provider} from 'react-redux'
 import store from './store';
+import DropDownMenu from './DropDownMenu';
+import { PaperProvider } from 'react-native-paper';
 
 const App = () => {
   return (
-    <Provider store={store}>
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <Title />
-      <DrawingCanvas />
-    </GestureHandlerRootView>
+      <Provider store={store}>
+        <PaperProvider>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+            <DropDownMenu />
+              <Title />
+            <DrawingCanvas />
+        </GestureHandlerRootView>
+      </PaperProvider>
     </Provider>
   );
 };

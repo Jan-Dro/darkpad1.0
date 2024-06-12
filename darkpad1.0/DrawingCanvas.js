@@ -410,6 +410,154 @@
 
 
 // V4 
+// import React, { useRef, useState, useEffect } from 'react';
+// import { View, StyleSheet, Button } from 'react-native';
+// import { Canvas, Path, useTouchHandler, Skia, PaintStyle, BlendMode } from '@shopify/react-native-skia';
+// import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
+// import Animated, { useSharedValue, useAnimatedStyle } from 'react-native-reanimated';
+// import { useSelector, useDispatch } from 'react-redux';
+// import Sidebar from './Sidebar';
+// import BrushSettings from './BrushSettings';
+// import { setPaths, setEraser, setColor, setStrokeWidth } from './store';
+
+// const DrawingCanvas = () => {
+//   const dispatch = useDispatch();
+//   const { paths, isEraser, currentColor, strokeWidth } = useSelector(state => state.drawing);
+//   const [localPaths, setLocalPaths] = useState([]);
+
+//   const paint = useRef(Skia.Paint());
+//   const currentPathRef = useRef(null);
+
+//   // Gesture state values
+//   const translationX = useSharedValue(0);
+//   const translationY = useSharedValue(0);
+//   const scale = useSharedValue(1);
+//   const angle = useSharedValue(0);
+//   const startScale = useSharedValue(1);
+//   const startAngle = useSharedValue(0);
+
+//   useEffect(() => {
+//     paint.current = Skia.Paint();
+//     paint.current.setBlendMode(isEraser ? BlendMode.Clear : BlendMode.SrcOver);
+//     paint.current.setColor(Skia.Color(currentColor));
+//     paint.current.setAntiAlias(true);
+//     paint.current.setStrokeWidth(strokeWidth);
+//     paint.current.setStyle(PaintStyle.Stroke);
+//   }, [isEraser, currentColor, strokeWidth]);
+
+//   const touchHandler = useTouchHandler({
+//     onStart: ({ x, y }) => {
+//       const path = Skia.Path.Make();
+//       path.moveTo(x, y);
+//       // const newPath = { path, paint: paint.current.copy() };
+//       currentPathRef.current = { path, paint: paint.current.copy() };
+//       setLocalPaths([...localPaths, currentPathRef.current]);
+//     },
+//     onActive: ({ x, y }) => {
+//       if (currentPathRef.current) {
+//         currentPathRef.current.path.lineTo(x, y);
+//         setLocalPaths([...localPaths.slice(0, -1), currentPathRef.current]);
+//       }
+//     },
+//     onEnd: () => {
+//       if (currentPathRef.current) {
+//         dispatch(setPaths([...paths, currentPathRef.current]));
+//         currentPathRef.current = null;
+//       }
+//     },
+//   });
+
+
+//   // Pan gesture for dragging
+//   const panGesture = Gesture.Pan()
+//     .minPointers(2)
+//     .onStart(() => {
+//       translationX.value += 0;
+//       translationY.value += 0;
+//     })
+//     .onUpdate((event) => {
+//       translationX.value = event.translationX;
+//       translationY.value = event.translationY;
+//     });
+
+//   // Pinch gesture for zooming
+//   const pinchGesture = Gesture.Pinch()
+//     .onStart(() => {
+//       startScale.value = scale.value;
+//     })
+//     .onUpdate((event) => {
+//       scale.value = Math.max(0.1, Math.min(startScale.value * event.scale, 10));
+//     });
+
+//   // Rotation gesture
+//   const rotationGesture = Gesture.Rotation()
+//     .onStart(() => {
+//       startAngle.value = angle.value;
+//     })
+//     .onUpdate((event) => {
+//       angle.value = startAngle.value + event.rotation;
+//     });
+
+//   // Combine gestures
+//   const combinedGesture = Gesture.Simultaneous(panGesture, pinchGesture, rotationGesture);
+
+//   const animatedStyle = useAnimatedStyle(() => ({
+//     transform: [
+//       { translateX: translationX.value },
+//       { translateY: translationY.value },
+//       { scale: scale.value },
+//       { rotate: `${angle.value}rad` },
+//     ],
+//   }));
+
+//   return (
+//     <GestureHandlerRootView style={styles.container}>
+//       <GestureDetector gesture={combinedGesture}>
+//         <Animated.View style={[styles.canvasContainer, animatedStyle]}>
+//         <Canvas style={styles.canvas} onTouch={touchHandler}>
+//             {paths.concat(localPaths).map(({ path, paint }, index) => (
+//               <Path key={index} path={path} paint={paint} />
+//             ))}
+//           </Canvas>
+//         </Animated.View>
+//       </GestureDetector>
+//       <Button title="Clear" onPress={() => {
+//         setLocalPaths([]);
+//         dispatch(setPaths([]));
+//       }} />
+//     </GestureHandlerRootView>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//     backgroundColor: '#333',
+//   },
+//   canvasContainer: {
+//     flex: 1,
+//     width: '90%',
+//     borderColor: 'black',
+//     borderWidth: 4,
+//     borderRadius: 10,
+//     overflow: 'hidden',
+//     backgroundColor: 'white'  // Ensures visibility
+//   },
+//   canvas: {
+//     flex: 1,
+//     width: '100%',
+//     height: '100%',
+//     backgroundColor: 'white',
+//     }
+// });
+
+// export default DrawingCanvas;
+
+
+
+// v5
 import React, { useRef, useState, useEffect } from 'react';
 import { View, StyleSheet, Button } from 'react-native';
 import { Canvas, Path, useTouchHandler, Skia, PaintStyle, BlendMode } from '@shopify/react-native-skia';
@@ -419,12 +567,13 @@ import { useSelector, useDispatch } from 'react-redux';
 import Sidebar from './Sidebar';
 import BrushSettings from './BrushSettings';
 import { setPaths, setEraser, setColor, setStrokeWidth } from './store';
+import { Button as Button1, Menu, Divider, Provider } from 'react-native-paper';
 
 const DrawingCanvas = () => {
   const dispatch = useDispatch();
   const { paths, isEraser, currentColor, strokeWidth } = useSelector(state => state.drawing);
   const [localPaths, setLocalPaths] = useState([]);
-
+  const {layers, activeLayerIndex} = useSelector(state => state.drawing);
   const paint = useRef(Skia.Paint());
   const currentPathRef = useRef(null);
 
@@ -449,7 +598,6 @@ const DrawingCanvas = () => {
     onStart: ({ x, y }) => {
       const path = Skia.Path.Make();
       path.moveTo(x, y);
-      // const newPath = { path, paint: paint.current.copy() };
       currentPathRef.current = { path, paint: paint.current.copy() };
       setLocalPaths([...localPaths, currentPathRef.current]);
     },
@@ -472,7 +620,7 @@ const DrawingCanvas = () => {
   const panGesture = Gesture.Pan()
     .minPointers(2)
     .onStart(() => {
-      translationX.value += 0; // Initialize if needed
+      translationX.value += 0;
       translationY.value += 0;
     })
     .onUpdate((event) => {
@@ -512,11 +660,6 @@ const DrawingCanvas = () => {
 
   return (
     <GestureHandlerRootView style={styles.container}>
-      <Sidebar onPaint={() => dispatch(setEraser(false))} onErase={() => dispatch(setEraser(true))} />
-      <BrushSettings onSettingsChange={({ size, color }) => {
-        dispatch(setStrokeWidth(size));
-        dispatch(setColor(color));
-      }} />
       <GestureDetector gesture={combinedGesture}>
         <Animated.View style={[styles.canvasContainer, animatedStyle]}>
         <Canvas style={styles.canvas} onTouch={touchHandler}>
@@ -539,6 +682,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#333',
   },
   canvasContainer: {
     flex: 1,
@@ -553,7 +697,8 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     height: '100%',
-  }
+    backgroundColor: 'white',
+    }
 });
 
 export default DrawingCanvas;
